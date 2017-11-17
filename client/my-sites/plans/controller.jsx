@@ -7,19 +7,19 @@
 import page from 'page';
 import React from 'react';
 
+import { get } from 'lodash';
+
 /**
  * Internal Dependencies
  */
-import { renderWithReduxStore } from 'lib/react-helpers';
-import { get } from 'lodash';
 import { isValidFeatureKey } from 'lib/plans';
 
 export default {
-	plans( context ) {
+	plans( context, next ) {
 		const Plans = require( 'my-sites/plans/main' ),
 			CheckoutData = require( 'components/data/checkout' );
 
-		renderWithReduxStore(
+		context.primary = (
 			<CheckoutData>
 				<Plans
 					context={ context }
@@ -27,10 +27,9 @@ export default {
 					destinationType={ context.params.destinationType }
 					selectedFeature={ context.query.feature }
 				/>
-			</CheckoutData>,
-			document.getElementById( 'primary' ),
-			context.store
+			</CheckoutData>
 		);
+		next();
 	},
 
 	features( context ) {

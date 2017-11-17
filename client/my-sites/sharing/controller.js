@@ -13,7 +13,6 @@ import { translate } from 'i18n-calypso';
  */
 import notices from 'notices';
 import { pageView } from 'lib/analytics';
-import { renderWithReduxStore } from 'lib/react-helpers';
 import { sectionify } from 'lib/route';
 import Sharing from './main';
 import SharingButtons from './buttons/buttons';
@@ -23,19 +22,16 @@ import utils from 'lib/site/utils';
 
 const analyticsPageTitle = 'Sharing';
 
-export const layout = context => {
+export const layout = ( context, next ) => {
 	const site = sites().getSelectedSite();
-	const { contentComponent, path, store } = context;
+	const { contentComponent, path } = context;
 
 	if ( site && ! site.settings && utils.userCan( 'manage_options', site ) ) {
 		site.fetchSettings();
 	}
 
-	renderWithReduxStore(
-		createElement( Sharing, { contentComponent, path } ),
-		document.getElementById( 'primary' ),
-		store
-	);
+	context.primary = createElement( Sharing, { contentComponent, path } );
+	next();
 };
 
 export const connections = ( context, next ) => {

@@ -13,7 +13,6 @@ import React from 'react';
  */
 import Mentions from './mentions';
 import { getSelectedSite } from 'state/ui/selectors';
-import { renderWithReduxStore } from 'lib/react-helpers';
 
 /**
  * Module variables
@@ -24,7 +23,7 @@ function mentions( editor ) {
 	const node = document.createElement( 'div' );
 	let isRendered = false;
 
-	editor.on( 'init focus', () => {
+	editor.on( 'init focus', next => {
 		const store = editor.getParam( 'redux_store' );
 		const selectedSite = getSelectedSite( store.getState() );
 
@@ -41,6 +40,7 @@ function mentions( editor ) {
 			ReactDom.unmountComponentAtNode( node );
 			isRendered = false;
 		}
+		next();
 	} );
 
 	// Cancel Enter key press if the popover is visible.

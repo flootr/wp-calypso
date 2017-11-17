@@ -16,7 +16,6 @@ import App from './app';
 import Dashboard from './app/dashboard';
 import EmptyContent from 'components/empty-content';
 import { navigation, siteSelection, sites } from 'my-sites/controller';
-import { renderWithReduxStore } from 'lib/react-helpers';
 import installActionHandlers from './state/data-layer';
 import Order from './app/order';
 import OrderCreate from './app/order/order-create';
@@ -35,6 +34,7 @@ import Shipping from './app/settings/shipping';
 import ShippingZone from './app/settings/shipping/shipping-zone';
 import StatsController from './app/store-stats/controller';
 import StoreSidebar from './store-sidebar';
+import { makeLayout, render as clientRender } from 'controller';
 
 function initExtension() {
 	installActionHandlers();
@@ -170,16 +170,20 @@ const getStorePages = () => {
 };
 
 function addStorePage( storePage, storeNavigation ) {
-	page( storePage.path, siteSelection, storeNavigation, function( context ) {
-		const component = React.createElement( storePage.container, { params: context.params } );
-		const appProps =
-			( storePage.documentTitle && { documentTitle: storePage.documentTitle } ) || {};
-		renderWithReduxStore(
-			React.createElement( App, appProps, component ),
-			document.getElementById( 'primary' ),
-			context.store
-		);
-	} );
+	page(
+		storePage.path,
+		siteSelection,
+		storeNavigation,
+		function( context, next ) {
+			const component = React.createElement( storePage.container, { params: context.params } );
+			const appProps =
+				( storePage.documentTitle && { documentTitle: storePage.documentTitle } ) || {};
+			context.primary = React.createElement( App, appProps, component );
+			next();
+		},
+		makeLayout,
+		clientRender
+	);
 }
 
 function createStoreNavigation( context, next, storePage ) {
@@ -196,16 +200,12 @@ function createStoreNavigation( context, next, storePage ) {
 }
 
 function notFoundError( context, next ) {
-	renderWithReduxStore(
-		React.createElement( EmptyContent, {
-			className: 'content-404',
-			illustration: '/calypso/images/illustrations/illustration-404.svg',
-			title: translate( 'Uh oh. Page not found.' ),
-			line: translate( "Sorry, the page you were looking for doesn't exist or has been moved." ),
-		} ),
-		document.getElementById( 'content' ),
-		context.store
-	);
+	context.content = React.createElement( EmptyContent, {
+		className: 'content-404',
+		illustration: '/calypso/images/illustrations/illustration-404.svg',
+		title: translate( 'Uh oh. Page not found.' ),
+		line: translate( "Sorry, the page you were looking for doesn't exist or has been moved." ),
+	} );
 	next();
 }
 
@@ -220,10 +220,17 @@ export default function() {
 	} );
 
 	// Add pages that use my-sites navigation instead
-	page( '/store/stats/:type/:unit', siteSelection, sites );
-	page( '/store/stats/:type/:unit/:site', siteSelection, navigation, StatsController );
+	page( '/store/stats/:type/:unit', siteSelection, sites, makeLayout, clientRender );
+	page(
+		'/store/stats/:type/:unit/:site',
+		siteSelection,
+		navigation,
+		StatsController,
+		makeLayout,
+		clientRender
+	);
 
-	page( '/store/*', notFoundError );
+	page( '/store/*', notFoundError, makeLayout, clientRender );
 }
 
 // TODO: This could probably be done in a better way through the same mechanisms
