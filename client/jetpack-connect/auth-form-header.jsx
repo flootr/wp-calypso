@@ -15,6 +15,7 @@ import { getCurrentUser } from 'state/current-user/selectors';
 import FormattedHeader from 'components/formatted-header';
 import SiteCard from './site-card';
 import versionCompare from 'lib/version-compare';
+import { getJetpackConnectPartnerId } from 'state/selectors';
 
 class AuthFormHeader extends Component {
 	getState() {
@@ -36,10 +37,7 @@ class AuthFormHeader extends Component {
 	}
 
 	getPartnerSlug() {
-		const partnerId = parseInt(
-			get( this.props, [ 'authorize', 'queryObject', 'partner_id' ], 0 ),
-			10
-		);
+		const { partnerId } = this.props;
 
 		switch ( partnerId ) {
 			case 51945:
@@ -153,7 +151,8 @@ export default connect( state => {
 	const authorize = getAuthorizationData( state );
 	return {
 		authorize,
-		user: getCurrentUser( state ),
 		isAlreadyOnSitesList: isRemoteSiteOnSitesList( state ),
+		partnerId: getJetpackConnectPartnerId( state ),
+		user: getCurrentUser( state ),
 	};
 } )( localize( AuthFormHeader ) );
