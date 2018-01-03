@@ -4,7 +4,7 @@
  * External dependencies
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Gridicon from 'gridicons';
@@ -29,6 +29,7 @@ import FormRadio from 'components/forms/form-radio';
 import CompactFormToggle from 'components/forms/form-toggle/compact';
 import FormSettingExplanation from 'components/forms/form-setting-explanation';
 import Timezone from 'components/timezone';
+import QueryJetpackModules from 'components/data/query-jetpack-modules';
 import SiteIconSetting from './site-icon-setting';
 import Banner from 'components/banner';
 import { isBusiness } from 'lib/products-values';
@@ -37,6 +38,7 @@ import QuerySiteSettings from 'components/data/query-site-settings';
 import { isJetpackMinimumVersion, isJetpackSite } from 'state/sites/selectors';
 import { getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
 import { preventWidows } from 'lib/formatting';
+import Masterbar from './masterbar';
 
 class SiteSettingsFormGeneral extends Component {
 	componentWillMount() {
@@ -421,7 +423,12 @@ class SiteSettingsFormGeneral extends Component {
 
 		return (
 			<div className={ classNames( classes ) }>
-				{ site && <QuerySiteSettings siteId={ site.ID } /> }
+				{ site && (
+					<Fragment>
+						<QuerySiteSettings siteId={ site.ID } />
+						<QueryJetpackModules siteId={ site.ID } />
+					</Fragment>
+				) }
 
 				{ ! siteIsJetpack && this.netNeutralityOption() }
 
@@ -446,6 +453,17 @@ class SiteSettingsFormGeneral extends Component {
 						{ this.holidaySnowOption() }
 					</form>
 				</Card>
+
+				{ this.props.siteIsJetpack &&
+					this.props.jetpackMasterbarSupported && (
+						<Fragment>
+							<SectionHeader label={ translate( 'WordPress.com toolbar' ) } />
+							<Masterbar
+								isSavingSettings={ isSavingSettings }
+								isRequestingSettings={ isRequestingSettings }
+							/>
+						</Fragment>
+					) }
 
 				<SectionHeader label={ translate( 'Privacy' ) }>
 					<Button
@@ -530,6 +548,7 @@ const connectComponent = connect(
 			siteIsJetpack,
 			siteSlug: getSelectedSiteSlug( state ),
 			supportsHolidaySnowOption: ! siteIsJetpack || isJetpackMinimumVersion( state, siteId, '4.0' ),
+			jetpackMasterbarSupported: isJetpackMinimumVersion( state, siteId, '4.8' ),
 		};
 	},
 	null,

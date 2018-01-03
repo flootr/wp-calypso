@@ -5,7 +5,7 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
 
@@ -32,7 +32,7 @@ const Masterbar = ( {
 	translate,
 } ) => {
 	return (
-		<div>
+		<Fragment>
 			<QueryJetpackConnection siteId={ selectedSiteId } />
 
 			<Card className="masterbar__card site-settings__security-settings">
@@ -58,7 +58,7 @@ const Masterbar = ( {
 					/>
 				</FormFieldset>
 			</Card>
-		</div>
+		</Fragment>
 	);
 };
 

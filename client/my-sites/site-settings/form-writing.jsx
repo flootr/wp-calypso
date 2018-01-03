@@ -18,16 +18,11 @@ import SectionHeader from 'components/section-header';
 import Button from 'components/button';
 import QueryTaxonomies from 'components/data/query-taxonomies';
 import TaxonomyCard from './taxonomies/taxonomy-card';
-import {
-	isJetpackSite,
-	isJetpackMinimumVersion,
-	siteSupportsJetpackSettingsUi,
-} from 'state/sites/selectors';
+import { isJetpackSite, siteSupportsJetpackSettingsUi } from 'state/sites/selectors';
 import { getSelectedSiteId } from 'state/ui/selectors';
 import { requestPostTypes } from 'state/post-types/actions';
 import Composing from './composing';
 import CustomContentTypes from './custom-content-types';
-import Masterbar from './masterbar';
 import MediaSettings from './media-settings';
 import ThemeEnhancements from './theme-enhancements';
 import PublishingTools from './publishing-tools';
@@ -80,17 +75,6 @@ class SiteSettingsFormWriting extends Component {
 				onSubmit={ this.props.handleSubmitForm }
 				className="site-settings__general-settings"
 			>
-				{ this.props.isJetpackSite &&
-					this.props.jetpackMasterbarSupported && (
-						<div>
-							{ this.renderSectionHeader( translate( 'WordPress.com toolbar' ), false ) }
-							<Masterbar
-								isSavingSettings={ isSavingSettings }
-								isRequestingSettings={ isRequestingSettings }
-							/>
-						</div>
-					) }
-
 				{ config.isEnabled( 'manage/site-settings/categories' ) && (
 					<div className="site-settings__taxonomies">
 						<QueryTaxonomies siteId={ siteId } postType="post" />
@@ -187,7 +171,6 @@ const connectComponent = connect(
 
 		return {
 			jetpackSettingsUISupported: siteSupportsJetpackSettingsUi( state, siteId ),
-			jetpackMasterbarSupported: isJetpackMinimumVersion( state, siteId, '4.8' ),
 			isJetpackSite: isJetpackSite( state, siteId ),
 			siteId,
 		};
